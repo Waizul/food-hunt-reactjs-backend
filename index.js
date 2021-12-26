@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const { MongoClient } = require('mongodb');
+const ObjectId = require('mongodb').ObjectId;
 require('dotenv').config();
 const port = process.env.PORT || 5000;
 const app = express();
@@ -22,7 +23,9 @@ async function run() {
 		const items = database.collection('items');
 
 		app.get('/items', async (req, res) => {
-			const query = { type: 'lunch' };
+			const query = req.query;
+			// const query = { type: type };
+			console.log(query);
 			const options = {
 				sort: { title: 1 },
 			};
@@ -34,9 +37,16 @@ async function run() {
 			}
 		});
 
-		app.post('/items', async (req, res) => {
-			const query = { fooditem: 'fooditem' };
-			res.json(query);
+		app.get('/items/:id', async (req, res) => {
+			const id = req.params.id;
+			const query = { _id: ObjectId(id) };
+			const item = await items.findOne(query);
+			res.json(item);
+		});
+
+		app.post('/user', async (req, res) => {
+			const user = req.body;
+			console.log(user);
 		});
 	} finally {
 		// Ensures that the client will close when you finish/error
